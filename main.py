@@ -1,5 +1,5 @@
 """
-Чат-бот 'ПРОГНОЗ ПОГОДЫ .'
+Чат-бот 'ПРОГНОЗ ПОГОДЫ !'
 RastsislauFirstBot
 """
 import requests
