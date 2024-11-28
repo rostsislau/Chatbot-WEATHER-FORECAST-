@@ -1,6 +1,6 @@
 """
-Чат-бот 'ПРОГНОЗ ПОГОДЫ !'
-RastsislauFirstBot
+Чат-бот 'ПРОГНОЗ ПОГОДЫ'
+Имя: RastsislauFirstBot
 """
 import requests
 import json
