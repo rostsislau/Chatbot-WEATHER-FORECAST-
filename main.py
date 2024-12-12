@@ -2,9 +2,12 @@
 Чат-бот 'ПРОГНОЗ ПОГОДЫ'
 Имя: RastsislauFirstBot
 """
-import requests
+
 import json
+
+import requests
 from telebot import types
+
 import secret
 
 bot = secret.bot
@@ -26,105 +29,153 @@ def count_message(message):
     return request_list
 
 
-@bot.message_handler(commands=['start'])
+@bot.message_handler(commands=["start"])
 def start(message):
-    mess = (f"<b>{message.from_user.first_name} {message.from_user.last_name}</b>, привет!"
-            f"\nЯ твой виртуальный помощник по погоде в любом городе мира.\n"
-            f"Поздоровайся со мной (/hello_world или Привет)")
-    bot.send_message(message.chat.id, mess, parse_mode='html')
+    mess = (
+        f"<b>{message.from_user.first_name} {message.from_user.last_name}</b>, привет!"
+        f"\nЯ твой виртуальный помощник по погоде в любом городе мира.\n"
+        f"Поздоровайся со мной (/hello_world или Привет)"
+    )
+    bot.send_message(message.chat.id, mess, parse_mode="html")
 
 
-@bot.message_handler(commands=['hello_world'])
+@bot.message_handler(commands=["hello_world"])
 def hello(message):
-    bot.send_message(message.chat.id, f"И тебе еще раз <b>ПРИВЕТ</b>", parse_mode='html')
-    bot.send_message(message.chat.id, f"\n Введи название города: ", parse_mode='html')
-    bot.register_next_step_handler(message, get_weather )
+    bot.send_message(
+        message.chat.id, f"И тебе еще раз <b>ПРИВЕТ</b>", parse_mode="html"
+    )
+    bot.send_message(message.chat.id, f"\n Введи название города: ", parse_mode="html")
+    bot.register_next_step_handler(message, get_weather)
 
 
-@bot.message_handler(commands=['menu'])
+@bot.message_handler(commands=["menu"])
 def keys_button(message):
-    bot.send_message(message.chat.id, f'<u>КНОПКИ:</u>'
-                                      '\n<b>actual</b> - температура на данный момент'
-                                      '\n<b>low</b> - минимальная температура за сутки'
-                                      '\n<b>high</b> - максимальная температура за сутки'
-                                      '\n<b>history</b> - история запросов', parse_mode='html')
+    bot.send_message(
+        message.chat.id,
+        f"<u>КНОПКИ:</u>"
+        "\n<b>actual</b> - температура на данный момент"
+        "\n<b>low</b> - минимальная температура за сутки"
+        "\n<b>high</b> - максимальная температура за сутки"
+        "\n<b>history</b> - история запросов",
+        parse_mode="html",
+    )
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=4)
-    low = types.KeyboardButton('/low')
-    high = types.KeyboardButton('/high')
-    actual = types.KeyboardButton('/actual')
-    hist = types.KeyboardButton('/history')
-    markup.add( actual, low, high, hist)
-    bot.send_message(message.chat.id, 'Выбери команду:', reply_markup=markup)
+    low = types.KeyboardButton("/low")
+    high = types.KeyboardButton("/high")
+    actual = types.KeyboardButton("/actual")
+    hist = types.KeyboardButton("/history")
+    markup.add(actual, low, high, hist)
+    bot.send_message(message.chat.id, "Выбери команду:", reply_markup=markup)
 
 
-@bot.message_handler(commands=['high'])
+@bot.message_handler(commands=["high"])
 def high_temperature(message):
     global count
     markup = types.InlineKeyboardMarkup()
-    bot.send_message(message.chat.id, f'<b>{city}</b>: максимальная температура '
-                                      f'за сутки: {data["main"]["temp_max"]} градуса', parse_mode='html')
-    max_temp_message = f'{city}: максимальная температура за сутки: {data["main"]["temp_max"]} градуса'
+    bot.send_message(
+        message.chat.id,
+        f"<b>{city}</b>: максимальная температура "
+        f'за сутки: {data["main"]["temp_max"]} градуса',
+        parse_mode="html",
+    )
+    max_temp_message = (
+        f'{city}: максимальная температура за сутки: {data["main"]["temp_max"]} градуса'
+    )
     count_message(max_temp_message)
-    bot.send_message(message.chat.id, 'Выбери следующую команду из меню или '
-                                      'введи название нового города', reply_markup=markup)
+    bot.send_message(
+        message.chat.id,
+        "Выбери следующую команду из меню или " "введи название нового города",
+        reply_markup=markup,
+    )
 
 
-@bot.message_handler(commands=['low'])
+@bot.message_handler(commands=["low"])
 def low_temperature(message):
     global count
     markup = types.InlineKeyboardMarkup()
-    bot.send_message(message.chat.id, f'<b>{city}</b>: минимальная температура '
-                                      f'за сутки: {data["main"]["temp_min"]} градуса', parse_mode='html')
-    min_temp_message = f'{city}: минимальная температура за сутки: {data["main"]["temp_min"]} градуса'
+    bot.send_message(
+        message.chat.id,
+        f"<b>{city}</b>: минимальная температура "
+        f'за сутки: {data["main"]["temp_min"]} градуса',
+        parse_mode="html",
+    )
+    min_temp_message = (
+        f'{city}: минимальная температура за сутки: {data["main"]["temp_min"]} градуса'
+    )
     count_message(min_temp_message)
-    bot.send_message(message.chat.id, 'Выбери следующую команду из меню или '
-                                      'введи название нового города', reply_markup=markup)
+    bot.send_message(
+        message.chat.id,
+        "Выбери следующую команду из меню или " "введи название нового города",
+        reply_markup=markup,
+    )
 
 
-@bot.message_handler(commands=['actual'])
+@bot.message_handler(commands=["actual"])
 def temperature_now(message):
     global count
     markup = types.InlineKeyboardMarkup()
-    bot.send_message(message.chat.id, f'<b>{city}</b>: температура на данный'
-                                      f' момент: {data["main"]["temp"]} градуса', parse_mode='html')
-    temp_message = f'{city}: температура на данный момент: {data["main"]["temp"]} градуса'
+    bot.send_message(
+        message.chat.id,
+        f"<b>{city}</b>: температура на данный"
+        f' момент: {data["main"]["temp"]} градуса',
+        parse_mode="html",
+    )
+    temp_message = (
+        f'{city}: температура на данный момент: {data["main"]["temp"]} градуса'
+    )
     count_message(temp_message)
-    bot.send_message(message.chat.id, 'Выбери следующую команду из меню или '
-                                      'введи название нового города', reply_markup=markup)
+    bot.send_message(
+        message.chat.id,
+        "Выбери следующую команду из меню или " "введи название нового города",
+        reply_markup=markup,
+    )
 
 
-@bot.message_handler(commands=['history'])
+@bot.message_handler(commands=["history"])
 def history(message):
     global request_list
     markup = types.InlineKeyboardMarkup()
-    bot.send_message(message.chat.id, f'<u>История последних 10 запросов: </u>', parse_mode='html')
+    bot.send_message(
+        message.chat.id, f"<u>История последних 10 запросов: </u>", parse_mode="html"
+    )
     for elem in request_list:
         bot.send_message(message.chat.id, elem)
-    bot.send_message(message.chat.id, 'Выбери следующую команду из меню или '
-                                      'введи название нового города', reply_markup=markup)
+    bot.send_message(
+        message.chat.id,
+        "Выбери следующую команду из меню или " "введи название нового города",
+        reply_markup=markup,
+    )
 
 
-@bot.message_handler(content_types=['text'])
+@bot.message_handler(content_types=["text"])
 def get_weather(message):
     global city, data
 
     try:
-        if message.text.lower() == 'привет':
-            bot.send_message(message.chat.id, f"И тебе еще раз <b>ПРИВЕТ</b>", parse_mode='html')
-            bot.send_message(message.chat.id, f"\n Введи название города: ", parse_mode='html')
+        if message.text.lower() == "привет":
+            bot.send_message(
+                message.chat.id, f"И тебе еще раз <b>ПРИВЕТ</b>", parse_mode="html"
+            )
+            bot.send_message(
+                message.chat.id, f"\n Введи название города: ", parse_mode="html"
+            )
             bot.register_next_step_handler(message, get_weather)
         else:
             city = message.text.strip().lower().title()
-            res = requests.get(f'https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API}&units=metric')
+            res = requests.get(
+                f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API}&units=metric"
+            )
             data = json.loads(res.text)
-            bot.send_message(message.chat.id, f'<b>страна: {data["sys"]["country"]}</b>\n', parse_mode='html')
+            bot.send_message(
+                message.chat.id,
+                f'<b>страна: {data["sys"]["country"]}</b>\n',
+                parse_mode="html",
+            )
             bot.register_next_step_handler(message, keys_button)
-            bot.send_message(message.chat.id, 'Введи команду /menu: ')
+            bot.send_message(message.chat.id, "Введи команду /menu: ")
     except KeyError:
-        bot.reply_to(message, 'Такого города не существует. Введи верное название: ')
+        bot.reply_to(message, "Такого города не существует. Введи верное название: ")
         bot.register_next_step_handler(message, get_weather)
 
 
 bot.polling(none_stop=True)
-
-
